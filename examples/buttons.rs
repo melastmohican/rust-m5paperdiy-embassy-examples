@@ -96,8 +96,10 @@ async fn main(_spawner: embassy_executor::Spawner) -> ! {
         error!("initial clear failed");
     }
     draw_status(&mut fb, "Press BtnA or BtnB");
-    if display.refresh(&fb, RefreshMode::M5Text).await.is_err() {
-        error!("first draw failed");
+    let start = Instant::now();
+    match display.refresh(&fb, RefreshMode::M5Text).await {
+        Ok(()) => info!("first draw in {} ms", start.elapsed().as_millis()),
+        Err(_) => error!("first draw failed"),
     }
     info!("ready");
 
