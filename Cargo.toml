@@ -30,6 +30,7 @@ epdpi-esp = { path = "../epdpi/epdpi-esp", default-features = false, features = 
 
 [dev-dependencies]
 profont = "0.7"
+u8g2-fonts = { version = "0.8.0", features = ["embedded_graphics_textstyle"] }
 
 # For fine tuning these settings, please refer to https://doc.rust-lang.org/cargo/reference/profiles.html
 [profile.dev]
