@@ -15,9 +15,10 @@
 //! ## Expected
 //!
 //! - Portrait menu: `Factory Test`, `Compare`, `Gray Ramp`, `Life Game`. A picks, B opens.
-//! - Factory Test: Battery (3.0 to 4.4 V passes), PSRAM, SD Card (card size) and Button A and
-//!   Button B turn to `[PASS]` when they pass or are pressed. B leaves, A reruns once both
-//!   buttons passed. **Not ported yet:** the Wi-Fi row says so and stays failed.
+//! - Factory Test: Battery (3.0 to 4.4 V passes), Wi-Fi (strongest access point above -55 dBm),
+//!   PSRAM, SD Card (card size), Button A and Button B turn to `[PASS]` when they pass or are
+//!   pressed. The scan takes a couple of seconds before the page appears. B leaves, A reruns
+//!   once both buttons passed.
 //! - Compare: A picks a mode, B refreshes with it and shows the time, hold B to leave.
 //! - Gray Ramp: 16 bands, A inverts, B leaves.
 //! - Life Game: A pauses, a second A resumes with new cells, B leaves.
@@ -43,6 +44,7 @@ use esp_hal::spi::Mode as SpiMode;
 use esp_hal::spi::master::{Config as SpiConfig, Spi};
 use esp_hal::time::Rate;
 use esp_println as _;
+use esp_radio::wifi::{ControllerConfig, WifiController, scan::ScanConfig};
 use rust_m5paperdiy_embassy_examples::esp_alloc::{HEAP, MemoryCapability};
 use rust_m5paperdiy_embassy_examples::{epdpi, pmic};
 
@@ -106,12 +108,36 @@ fn sd_card_mib<S: SpiDevice<u8>, D: DelayNs>(spi: S, delay: D) -> Option<u64> {
     card.num_bytes().ok().map(|bytes| bytes / (1024 * 1024))
 }
 
+/// Scans for access points: passes when the strongest one is above -55 dBm, like the sketch.
+async fn wifi_check(radio: &mut Option<WifiController<'static>>, item: &mut Check) {
+    let Some(controller) = radio else {
+        item.detail.set(format_args!("radio failed"));
+        return;
+    };
+    let config = ScanConfig::default().with_max(20);
+    match controller.scan_async(&config).await {
+        Ok(aps) => match aps.iter().max_by_key(|ap| ap.signal_strength) {
+            Some(ap) => {
+                item.pass = ap.signal_strength > -55;
+                item.detail.set(format_args!(
+                    "{} ({} dB)",
+                    ap.ssid.as_str(),
+                    ap.signal_strength
+                ));
+            }
+            None => item.detail.set(format_args!("no AP")),
+        },
+        Err(_) => item.detail.set(format_args!("scan failed")),
+    }
+}
+
 async fn run_checklist<B: EpdParallelBus, I: I2c, S: SpiDevice<u8>>(
     display: &mut EpdDisplay<'_, B, Ed047tc1>,
     fb: &mut Fb<'_>,
     pad: &mut Pad,
     i2c: &mut I,
     sd: &mut S,
+    radio: &mut Option<WifiController<'static>>,
 ) {
     loop {
         let mut items = [
@@ -132,7 +158,7 @@ async fn run_checklist<B: EpdParallelBus, I: I2c, S: SpiDevice<u8>>(
             }
             None => items[0].detail.set(format_args!("no answer")),
         }
-        items[1].detail.set(format_args!("not ported yet"));
+        wifi_check(radio, &mut items[1]).await;
         let psram = HEAP.free_caps(MemoryCapability::External.into());
         items[2].pass = psram > 16;
         if items[2].pass {
@@ -270,7 +296,18 @@ async fn run_life<B: EpdParallelBus>(
 #[esp_rtos::main]
 async fn main(_spawner: embassy_executor::Spawner) -> ! {
     let p = rust_m5paperdiy_embassy_examples::init!();
+    // The radio wants internal RAM, the sizes the `esp-radio` docs give. These go on the
+    // `esp-alloc` that `esp-radio` and `esp-rtos` use, hence `esp-alloc` 0.10 in this crate.
+    rust_m5paperdiy_embassy_examples::esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 64 * 1024);
+    rust_m5paperdiy_embassy_examples::esp_alloc::heap_allocator!(size: 36 * 1024);
     rust_m5paperdiy_embassy_examples::start_rtos!(p);
+    let mut radio = match esp_radio::wifi::new(p.WIFI, ControllerConfig::default()) {
+        Ok((controller, _interfaces)) => Some(controller),
+        Err(_) => {
+            error!("wifi init failed");
+            None
+        }
+    };
     let mut i2c = rust_m5paperdiy_embassy_examples::pmic_i2c!(p);
     let mut delay = Delay::new();
     let _ = pmic::epd_power_on(&mut i2c, &mut delay);
@@ -332,7 +369,17 @@ async fn main(_spawner: embassy_executor::Spawner) -> ! {
         }
         if b.pressed {
             match selected {
-                0 => run_checklist(&mut display, &mut fb, &mut pad, &mut i2c, &mut sd).await,
+                0 => {
+                    run_checklist(
+                        &mut display,
+                        &mut fb,
+                        &mut pad,
+                        &mut i2c,
+                        &mut sd,
+                        &mut radio,
+                    )
+                    .await
+                }
                 1 => run_compare(&mut display, &mut fb, &mut pad).await,
                 2 => run_ramp(&mut display, &mut fb, &mut pad).await,
                 _ => run_life(&mut display, &mut fb, &mut pad).await,
