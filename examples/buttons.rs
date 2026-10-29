@@ -15,7 +15,7 @@
 //! ## Expected
 //!
 //! - After the first draw the log prints `ready`. Each press prints `BtnA pressed` or
-//!   `BtnB pressed` and the screen updates in about 0.7 s.
+//!   `BtnB pressed`, then `update in N ms` when the screen is done.
 //! - A press during an update is seen after it ends, as in the sketch.
 //! - Portrait, 540 by 960, like the sketch (the buffer is turned with `Rotation::Deg270`).
 //! - Differences from the Arduino sketch: `u8g2-fonts` Free Universal Bold instead of
@@ -28,7 +28,7 @@ extern crate alloc;
 
 use alloc::vec;
 use defmt::{error, info};
-use embassy_time::{Duration, Timer};
+use embassy_time::{Duration, Instant, Timer};
 use embedded_graphics::{pixelcolor::Gray4, prelude::*};
 use esp_hal::delay::Delay;
 use esp_hal::gpio::{Input, InputConfig, Pull};
@@ -115,8 +115,10 @@ async fn main(_spawner: embassy_executor::Spawner) -> ! {
         if let Some(text) = action {
             info!("{}", text);
             draw_status(&mut fb, text);
-            if display.refresh(&fb, RefreshMode::M5Text).await.is_err() {
-                error!("update failed");
+            let start = Instant::now();
+            match display.refresh(&fb, RefreshMode::M5Text).await {
+                Ok(()) => info!("update in {} ms", start.elapsed().as_millis()),
+                Err(_) => error!("update failed"),
             }
         }
         // Keep the pre-update state, so a press during the 0.7 s update is an edge next time.
