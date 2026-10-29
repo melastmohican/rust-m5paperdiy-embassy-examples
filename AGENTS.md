@@ -9,3 +9,9 @@ Async twin of `../rust-m5paperdiy-examples`, for the `epdpi` workspace in `../ep
 - Checks: `cargo fmt --all -- --check`, `cargo clippy --release --examples --lib -- -D warnings`.
 - Blocking is only for start-up work (PMIC I2C). Everything on the bus is `.await`ed.
 - Open work lives in `../epdpi/.agents/notes/backlog.md`, queue item 2 and 3.
+- Keep `esp-alloc` on the same version as `esp-radio` and `esp-rtos` use (check
+  `cargo tree -d | grep esp-alloc`). Two copies mean two heaps: `heap_allocator!` fills ours, the
+  global allocator is the other one and is empty, and the first allocation in `esp_radio::wifi::new`
+  panics with `memory allocation of 4 bytes failed`.
+- `esp-radio` needs the `esp-rtos` scheduler (`start_rtos!`) and has no blocking scan in 0.18, so
+  Wi-Fi examples exist here only.

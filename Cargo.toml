@@ -10,8 +10,8 @@ categories   = ["embedded", "no-std"]
 
 [dependencies]
 esp-hal                = { version = "~1.1.0", features = ["defmt", "esp32s3", "unstable"] }
-esp-rtos               = { version = "0.3.0", features = ["defmt", "embassy", "esp32s3"] }
-esp-alloc              = { version = "0.9.0", features = ["defmt", "esp32s3"] }
+esp-rtos               = { version = "0.3.0", features = ["defmt", "embassy", "esp32s3", "esp-radio", "esp-alloc"] }
+esp-alloc              = { version = "0.10.0", features = ["defmt", "esp32s3"] }
 esp-bootloader-esp-idf = { version = "0.5.0", features = ["defmt", "esp32s3"] }
 esp-println            = { version = "0.17.0", features = ["defmt-espflash", "esp32s3"] }
 
@@ -27,6 +27,7 @@ embedded-hal       = "1.0.0"
 # `rust-m5paperdiy-examples`. Cargo would unify the two modes inside one workspace.
 epdpi     = { path = "../epdpi/epdpi", default-features = false, features = ["defmt", "graphics"] }
 epdpi-esp = { path = "../epdpi/epdpi-esp", default-features = false, features = ["esp32s3", "defmt"] }
+esp-radio = { version = "0.18.0", features = ["wifi", "esp32s3", "unstable", "defmt"] }
 
 [dev-dependencies]
 profont = "0.7"
