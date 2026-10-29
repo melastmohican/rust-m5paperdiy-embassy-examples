@@ -30,6 +30,8 @@ epdpi-esp = { path = "../epdpi/epdpi-esp", default-features = false, features = 
 esp-radio = { version = "0.18.0", features = ["wifi", "esp32s3", "unstable", "defmt"] }
 
 [dev-dependencies]
+embedded-hal-bus = "0.2.0"
+embedded-sdmmc = "0.7.0"
 profont = "0.7"
 u8g2-fonts = { version = "0.8.0", features = ["embedded_graphics_textstyle"] }
 
