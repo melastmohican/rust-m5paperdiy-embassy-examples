@@ -7,6 +7,8 @@ Async twin of `../rust-m5paperdiy-examples`, for the `epdpi` workspace in `../ep
   `epdpi/blocking` back on). Board support in `src/lib.rs` is copied on purpose.
 - Build and run from here: `cargo build --release --examples`, `cargo run --release --example X`.
 - Checks: `cargo fmt --all -- --check`, `cargo clippy --release --examples --lib -- -D warnings`.
+- Every example says it is the async build: a small `Rust: epdpi async` label on the screen, or `info!("<name>: Rust, async")` first in
+  `main` when it has no display. Same words as the blocking twin.
 - Blocking is only for start-up work (PMIC I2C). Everything on the bus is `.await`ed.
 - Open work lives in `../epdpi/.agents/notes/backlog.md`, queue item 2 and 3.
 - Keep `esp-alloc` on the same version as `esp-radio` and `esp-rtos` use (check

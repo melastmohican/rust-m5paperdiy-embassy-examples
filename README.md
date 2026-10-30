@@ -28,7 +28,8 @@ cargo run --release --example user_demo
 | `pm1_timer` | Port of the `M5PM1` sketch: the power chip's timer shuts the board down and brings it back after 3 s (BtnA), or powers it off after 3 s (BtnB). It powers the board off |
 | `wifi_scan` | Logs the access points found by an `esp-radio` scan every 5 s |
 
-Each example's header comment says what to expect. The sketches are in
+Each example's header comment says what to expect. Every example says it is the async build: a small
+`Rust: epdpi async` label on the screen, or `<name>: Rust, async` as the first log line for `wifi_scan`. The sketches are in
 [m5paperdiy-arduino-examples](https://github.com/melastmohican/m5paperdiy-arduino-examples).
 
 ## Status
