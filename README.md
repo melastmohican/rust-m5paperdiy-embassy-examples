@@ -26,6 +26,7 @@ cargo run --release --example user_demo
 | `factory_test` | Port of `FactoryTest`: the menu with the checklist, Compare, Gray Ramp and Life Game pages |
 | `user_demo` | Port of `PaperDIYUserDemo`: the poster with battery, Wi-Fi list, card speed test, button feedback and power-off |
 | `pm1_timer` | Port of the `M5PM1` sketch: the power chip's timer shuts the board down and brings it back after 3 s (BtnA), or powers it off after 3 s (BtnB). It powers the board off |
+| `sd_images` | Port of the `microSD` sketch: appends to a log file on the card, then shows a PNG from it; A and B flip between two images |
 | `wifi_scan` | Logs the access points found by an `esp-radio` scan every 5 s |
 
 Each example's header comment says what to expect. Every example says it is the async build: a small
@@ -50,7 +51,7 @@ board:
   from the main loop with `embassy_futures::poll_once`, the same code as the blocking twin.
 - The microSD card is read through `embedded-sdmmc` over a blocking SPI device in both projects,
   because the card work is short and the crate has no async API.
-- `factory_test` and `user_demo` keep their drawing and state machines in an inline `mod ui`
+- `factory_test`, `user_demo` and `sd_images` keep their drawing and state machines in an inline `mod ui`
   block. It is the same text as in `rust-m5paperdiy-examples`, where `host-tests/` tests it. Change
   one and copy the change to the other.
 - Keep `esp-alloc` on the version `esp-radio` and `esp-rtos` use (0.10, check with
