@@ -536,9 +536,11 @@ async fn main(_spawner: embassy_executor::Spawner) -> ! {
     };
 
     // `epaper.clearWhite()`: the panel and the buffer start white.
+    let clear_start = Instant::now();
     if display.clear().await.is_err() {
         error!("clear failed");
     }
+    info!("clear at start: {} ms", clear_start.elapsed().as_millis());
     fb.clear_dirty();
 
     let rng = Rng::new();
@@ -576,9 +578,11 @@ async fn main(_spawner: embassy_executor::Spawner) -> ! {
 
     Timer::after(Duration::from_secs(3)).await;
     // `epaper.clearWhite(false)` and `epaper.deInit()`.
+    let clear_start = Instant::now();
     if display.clear().await.is_err() {
         error!("final clear failed");
     }
+    info!("final clear: {} ms", clear_start.elapsed().as_millis());
     let _ = pmic::epd_power_off(&mut i2c);
     rust_m5paperdiy_embassy_examples::halt();
 }
