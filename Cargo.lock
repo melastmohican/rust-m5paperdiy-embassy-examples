@@ -1882,6 +1882,7 @@ dependencies = [
  "critical-section",
  "defmt 1.2.0",
  "embassy-executor",
+ "embassy-futures",
  "embassy-time",
  "embedded-graphics",
  "embedded-hal 1.0.0",
