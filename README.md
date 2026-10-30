@@ -25,6 +25,7 @@ cargo run --release --example user_demo
 | `text_log_scroll` | Port of `TextLogScroll`: a scrolling log, one full-screen `M5Fastest` update per line |
 | `factory_test` | Port of `FactoryTest`: the menu with the checklist, Compare, Gray Ramp and Life Game pages |
 | `user_demo` | Port of `PaperDIYUserDemo`: the poster with battery, Wi-Fi list, card speed test, button feedback and power-off |
+| `pm1_timer` | Port of the `M5PM1` sketch: the power chip's timer shuts the board down and brings it back after 3 s (BtnA), or powers it off after 3 s (BtnB). It powers the board off |
 | `wifi_scan` | Logs the access points found by an `esp-radio` scan every 5 s |
 
 Each example's header comment says what to expect. The sketches are in
@@ -32,7 +33,7 @@ Each example's header comment says what to expect. The sketches are in
 
 ## Status
 
-All seven examples run on a PaperDIY. Compared with the blocking twins, a refresh takes about 5
+All eight examples run on a PaperDIY. Compared with the blocking twins, a refresh takes about 5
 to 40 percent longer, because every row awaits the DMA instead of spinning. Measured on the same
 board:
 

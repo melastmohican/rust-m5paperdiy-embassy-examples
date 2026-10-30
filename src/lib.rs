@@ -126,15 +126,25 @@ macro_rules! lcd_bus {
 pub mod pmic {
     use super::*;
 
-    /// I2C address. M5GFX uses 0x6E.
+    /// I2C address. M5GFX uses 0x6E. The M5IOE1 expander on other boards sits at 0x6F.
     pub const ADDR: u8 = 0x6E;
+    /// Value of registers 0x00..0x01 (little endian) on a genuine M5PM1.
+    pub const DEVICE_ID: u16 = 0x2050;
 
+    const REG_ID: u8 = 0x00;
     const REG_GPIO_MODE: u8 = 0x10;
     const REG_GPIO_OUT: u8 = 0x11;
     const REG_GPIO_DRV: u8 = 0x13;
     const REG_GPIO_FUNC: u8 = 0x16;
     /// GPIO2 gates EPD_PWR.
     const EPD_PWR_BIT: u8 = 1 << 2;
+
+    /// Reads the device ID register pair.
+    pub fn read_id<I: I2c>(i2c: &mut I) -> Result<u16, I::Error> {
+        let mut id = [0u8; 2];
+        i2c.write_read(ADDR, &[REG_ID], &mut id)?;
+        Ok(u16::from_le_bytes(id))
+    }
 
     fn update<I: I2c>(i2c: &mut I, reg: u8, clear: u8, set: u8) -> Result<(), I::Error> {
         let mut cur = [0u8; 1];
@@ -155,6 +165,11 @@ pub mod pmic {
         update(i2c, REG_GPIO_OUT, 0, EPD_PWR_BIT)?; // high
         delay.delay_ms(10);
         Ok(())
+    }
+
+    /// Drives GPIO2 low.
+    pub fn epd_power_off<I: I2c>(i2c: &mut I) -> Result<(), I::Error> {
+        update(i2c, REG_GPIO_OUT, EPD_PWR_BIT, 0)
     }
 }
 
