@@ -1,5 +1,9 @@
 # rust-m5paperdiy-embassy-examples
 
+> **Moved.** These examples are now the [`async/`](https://github.com/melastmohican/rust-m5paperdiy-examples/tree/main/async)
+> folder of [`rust-m5paperdiy-examples`](https://github.com/melastmohican/rust-m5paperdiy-examples), next to the blocking
+> examples, with this repository's history. This repository is archived and no longer updated.
+
 Async (Embassy) examples for the [`epdpi`](https://github.com/melastmohican/epdpi) e-paper
 driver on the M5Stack PaperDIY (ESP32-S3, ED047TC1 panel). Structure and dependency versions follow
 `rust-reterminal-e1002-examples`.
