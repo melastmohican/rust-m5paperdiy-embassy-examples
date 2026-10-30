@@ -1,6 +1,6 @@
 //! # epdpi_lcd_ramp: 16-level grayscale over the async LCD_CAM DMA bus (M5Stack PaperDIY)
 //!
-//! The async twin of `epdpi_lcd_ramp` in `rust-m5paperdiy-examples`. Same ramp
+//! The async twin of `epdpi_lcd_ramp` on the `bringup` branch of `rust-m5paperdiy-examples`. Same ramp
 //! (`RefreshMode::M5Quality`), same `lcd_bus::LcdBus`, but `epdpi` runs in async mode on the
 //! `esp-rtos` Embassy executor and a row waits for the DMA with `wait_for_done` instead of
 //! spinning.

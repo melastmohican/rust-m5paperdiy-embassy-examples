@@ -19,7 +19,7 @@ cargo run --release --example user_demo
 
 | Example | What it does |
 | :--- | :--- |
-| `epdpi_lcd_ramp` | The `LcdBus` async path: a 16-gray `M5Quality` ramp, to compare with the blocking example |
+| `epdpi_lcd_ramp` | The `LcdBus` async path: a 16-gray `M5Quality` ramp, to compare with the blocking example on the `bringup` branch of `rust-m5paperdiy-examples` |
 | `display_demo` | Port of the Arduino `Display` sketch: a bordered page with text and a four cell gray bar |
 | `buttons` | Port of `Button`: shows the last button pressed, `M5Text` |
 | `text_log_scroll` | Port of `TextLogScroll`: a scrolling log, one full-screen `M5Fastest` update per line |
